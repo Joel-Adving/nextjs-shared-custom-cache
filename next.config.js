@@ -1,13 +1,15 @@
+const nextBuildId = require('next-build-id')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  cacheHandler:
-    process.env.NODE_ENV === "production"
-      ? require.resolve("./cache-handler.js")
-      : undefined,
-  env: {
-    NEXT_PUBLIC_REDIS_INSIGHT_URL:
-      process.env.REDIS_INSIGHT_URL ?? "http://localhost:8001",
+  output: 'standalone',
+  cacheHandler: process.env.NODE_ENV === 'production' ? require.resolve('./cache-handler.js') : undefined,
+  experimental: {
+    instrumentationHook: true
   },
-};
+  generateBuildId: () => {
+    return nextBuildId({ dir: __dirname, describe: true })
+  }
+}
 
-module.exports = nextConfig;
+module.exports = nextConfig

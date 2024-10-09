@@ -1,7 +1,50 @@
 services:
-  redis-stack:
+  redis:
     image: redis/redis-stack:latest
-    container_name: cache-handler-redis
     ports:
-      - "6379:6379"
-      - "8001:8001"
+      - '6379:6379'
+      - '8001:8001'
+    networks:
+      - stack-network
+
+  nextjs-build:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nextjs-app:latest
+    networks:
+      - stack-network
+    command: echo "Building image..."
+
+  nextjs-instance-1:
+    image: nextjs-app:latest
+    depends_on:
+      - nextjs-build
+    networks:
+      - stack-network
+    environment:
+      - INSTANCE_NAME=nextjs-instance-1
+
+  nextjs-instance-2:
+    image: nextjs-app:latest
+    depends_on:
+      - nextjs-build
+    networks:
+      - stack-network
+    environment:
+      - INSTANCE_NAME=nextjs-instance-2
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - '80:80'
+    depends_on:
+      - nextjs-instance-1
+      - nextjs-instance-2
+    networks:
+      - stack-network
+
+networks:
+  stack-network:

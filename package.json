@@ -16,6 +16,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "next-build-id": "^3.0.0",
     "typescript": "^5.3.3"
   }
 }
